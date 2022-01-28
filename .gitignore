@@ -1,2 +1,2 @@
-GitIgnoredData/*.csv
+*.csv
 .DS_Store
