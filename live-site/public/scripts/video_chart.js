@@ -1,9 +1,9 @@
 // set the dimensions and margins of the graph
 var video_data_margins = {
         top: 10,
-        right: 30,
-        bottom: 30,
-        left: 60
+        right: 90,
+        bottom: 50,
+        left: 0
     },
     width = 1000 - video_data_margins.left - video_data_margins.right,
     height = 600 - video_data_margins.top - video_data_margins.bottom;
@@ -20,11 +20,16 @@ var video_Svg = d3.select(video_div_selector)
         "translate(" + video_data_margins.left + "," + video_data_margins.top + ")");
 
 //Read the data
-d3.csv("https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/iris.csv", function (data) {
+// d3.csv("https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/iris.csv", function (data) {
+// d3.csv("../data/master_export_tiny.csv", function (data) {
+d3.csv("../data/master_export_fragment.csv", function (data) {
+    // d3.csv("../data/iris.csv", function (data) {
+    console.log("Loaded data");
+    document.querySelector("#loading").innerHTML = "Loading data ✔<br>Rendering data...";
 
     // Add X axis
-    const x_domain_start = 4;
-    const x_domain_end = 8;
+    const x_domain_start = -1.0; // iris is 4
+    const x_domain_end = 1.0; // iris is 8
     var x = d3.scaleLinear()
         .domain([x_domain_start, x_domain_end])
         .range([0, width]);
@@ -33,8 +38,8 @@ d3.csv("https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/ir
         .call(d3.axisBottom(x));
 
     // Add Y axis
-    const y_domain_start = 0;
-    const y_domain_end = 9;
+    const y_domain_start = 0; // iris is 0
+    const y_domain_end = 94822892; // iris is 9
     var y = d3.scaleLinear()
         .domain([y_domain_start, y_domain_end])
         .range([height, 0]);
@@ -51,7 +56,7 @@ d3.csv("https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/ir
 
     // Add a tooltip div. Here I define the general feature of the tooltip: stuff that do not depend on the data point.
     // Its opacity is set to 0: we don't see it by default.
-    var tooltip = d3.select(video_div_selector)
+    var tooltip = d3.select("#dataviz_video_tooltip")
         .append("div")
         .style("opacity", 0)
         .attr("class", "tooltip")
@@ -69,19 +74,20 @@ d3.csv("https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/ir
     }
 
     var mousemove = function (d) {
+        console.log("tooltip trigger");
         // TODO `this` is not bound correctly, have to move the offsets manually every time the graph is moved on the page
         tooltip
-            .html(`Video title: ${d.title}<br>Views: ${d.views}<br>Likes: ${d.likes}<br>Dislikes: ${d.dislikes}`)
-            .style("left", (d3.mouse(this)[0] + 200) + "px") // It is important to put the +90: other wise the tooltip is exactly where the point is an it creates a weird effect
-            .style("top", (d3.mouse(this)[1] + 100) + "px")
+            .html(`Video title: ${d.title}<br>Views: ${d.view_count}<br>Likes: ${d.likes}<br>Dislikes: ${d.dislikes}<br>Video Link: <a href="https://www.youtube.com/watch?v=${d.video_id}">Click Here</a>`)
+        // .style("left", (d3.mouse(video_Svg)[0] + 0) + "px") // It is important to put the +90: other wise the tooltip is exactly where the point is an it creates a weird effect
+        // .style("top", (d3.mouse(video_Svg)[1] + 0) + "px")
     }
 
     // A function that change this tooltip when the leaves a point: just need to set opacity to 0 again
     var mouseleave = function (d) {
-        tooltip
-            .transition()
-            .duration(0)
-            .style("opacity", 0)
+        // tooltip
+        //     .transition()
+        //     .duration(0)
+        //     .style("opacity", 0)
     }
 
     // END TOOLTIP STUFF ================================
@@ -127,16 +133,36 @@ d3.csv("https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/ir
         .on("mouseleave", mouseleave)
         // End tooltip handlers
         .attr("cx", function (d) {
-            return x(d.Sepal_Length);
+            // return x(d.Sepal_Length);
+            return x(d.favorability);
         })
         .attr("cy", function (d) {
-            return y(d.Petal_Length);
+            // return y(d.Petal_Length);
+            return y(d.view_count);
         })
         .attr("r", 8)
         .style("fill", function (d) {
-            return color(d.Species)
+            // return color(d.Species)
+            return "#440154ff"
         })
         .style("opacity", 0.5)
+
+    video_Svg.append("text")
+        .attr("class", "x label")
+        .attr("text-anchor", "end")
+        .attr("x", width / 2)
+        .attr("y", height + 40)
+        .text("Favorability");
+
+    video_Svg.append("text")
+        .attr("class", "y label")
+        .attr("text-anchor", "end")
+        .attr("x", -height/2)
+        .attr("y", width + 70)
+        .attr("dy", ".75em")
+        .attr("transform", "rotate(-90)")
+        .text("View Count");
+
 
     // A function that set idleTimeOut to null
     var idleTimeout;
@@ -151,6 +177,7 @@ d3.csv("https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/ir
         extent = d3.event.selection
 
         console.log("Event is", d3.event);
+        document.querySelector("#loading").innerHTML = "Re-Rendering data...";
 
         // If no selection, back to initial coordinate. Otherwise, update X axis domain
         if (!extent) {
@@ -184,14 +211,19 @@ d3.csv("https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/ir
             .selectAll("circle")
             .transition().duration(1000)
             .attr("cx", function (d) {
-                return x(d.Sepal_Length);
+                // return x(d.Sepal_Length);
+                return x(d.favorability);
             })
             .attr("cy", function (d) {
-                return y(d.Petal_Length);
+                // return y(d.Petal_Length);
+                return y(d.view_count);
             })
+
+        document.querySelector("#loading").innerHTML = "Re-Render Complete ✔";
 
     }
 
+    document.querySelector("#loading").innerHTML = "Data loaded and rendered ✔";
 
 
 })

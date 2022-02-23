@@ -16,19 +16,31 @@
   </nav>
   <div id="mainPage" class="container page-container">
 
-    <!-- <p>
-      Testing rating lineplot on fake data
-    </p>
-    <div id="my_dataviz"></div>
-
-    <div id="dataviz_brushZoom"></div>
-
-    <div id="my_dataviz_scatter_tooltip"></div> -->
-
-    <p>Hover over a datapoint for details</p>
+    <p>Click on a datapoint for details on that video</p>
     <p>Drag a region to zoom to it</p>
     <p>Double click to zoom out</p>
     <div id="dataviz_video"></div>
+    <h3 id="loading">Downloading data...</h3>
+    <div id="dataviz_video_tooltip"></div>
+
+    <!-- TODO better spacing later -->
+    <h1>&nbsp;</h1>
+    <h1>&nbsp;</h1>
+    <h1>&nbsp;</h1>
+
+    <h2>Background Info</h2>
+    <div>
+      <h3>Feature Explanation</h3>
+
+      <h4>Likes/Dislikes</h4>
+      <p>The standard Youtube statistic. Signed in users can press the thumbs-up or thumbs-down button to record these on a video.</p>
+      <h4>Activity</h4>
+      <p>Likes + Dislikes. The attention a video has drawn to get people to vote, one way or the other.</p>
+      <h4>Combined Rating</h4>
+      <p>Likes - Dislikes. Closer to 0 means more contentious. More negative => largely dislikes, more positive => largely likes</p>
+      <h4>Favorability</h4>
+      <p>Combined Rating / Activity. Range of -1 to 1. Combined Rating normalized by how much total reaction a video drew from people. -1 means strong dislike, 1 means strong like, 0 means contentious or no data</p>
+    </div>
 
   </div>
   <!-- D3 v6 for Lineplot -->
